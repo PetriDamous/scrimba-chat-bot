@@ -24,18 +24,16 @@ const setupEmbeddings = async () => {
     });
 
     // 4. Initialize Supabase client
-    const supabaseUrl = "/supabase";
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL_LC_CHATBOT;
     const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 
-    console.log(supabaseUrl);
+    console.log(import.meta.env.VITE_HUGGINGFACE_API_KEY);
 
     if (!import.meta.env.VITE_HUGGINGFACE_API_KEY) {
       throw new Error("Hugging Face API key is missing.");
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
-
-    console.log("woof");
 
     // 5. Store documents and embeddings in Supabase using VectorStore
     await SupabaseVectorStore.fromDocuments(
@@ -69,4 +67,4 @@ const setupEmbeddings = async () => {
   }
 };
 
-setupEmbeddings();
+export default setupEmbeddings;
