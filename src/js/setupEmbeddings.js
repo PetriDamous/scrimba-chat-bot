@@ -20,20 +20,22 @@ const setupEmbeddings = async () => {
     // 3. Initialize Hugging Face embeddings using your custom class
     const hfEmbeddings = new HuggingFaceInferenceEmbeddings({
       apiKey: import.meta.env.VITE_HUGGINGFACE_API_KEY, // Hugging Face API key
-      model: "sentence-transformers/all-MiniLM-L6-v2", // Chosen Hugging Face model
+      model: "BAAI/bge-large-en-v1.5", // Chosen Hugging Face model
     });
 
     // 4. Initialize Supabase client
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL_LC_CHATBOT;
     const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 
-    console.log(import.meta.env.VITE_HUGGINGFACE_API_KEY);
+    console.log(supabaseUrl);
 
     if (!import.meta.env.VITE_HUGGINGFACE_API_KEY) {
       throw new Error("Hugging Face API key is missing.");
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    console.log("woof");
 
     // 5. Store documents and embeddings in Supabase using VectorStore
     await SupabaseVectorStore.fromDocuments(
@@ -67,4 +69,4 @@ const setupEmbeddings = async () => {
   }
 };
 
-export default setupEmbeddings;
+setupEmbeddings();
