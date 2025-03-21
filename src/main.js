@@ -1,7 +1,28 @@
 import { HuggingFaceInference } from "@langchain/community/llms/hf";
 import { PromptTemplate } from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
+import { createClient } from "@supabase/supabase-js";
+import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 
 const hfApiKey = import.meta.env.VITE_HUGGINGFACE_API_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL_LC_CHATBOT;
+const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
+
+const hfEmbeddings = new HuggingFaceInferenceEmbeddings({
+  apiKey: hfApiKey,
+  model: "BAAI/bge-large-en-v1.5",
+});
+
+const client = createClient(supabaseUrl, supabaseKey);
+
+const vectorStore = new SupabaseVectorStore(hfEmbeddings, {
+  client,
+  tableName: "documents",
+  queryName: "match_documents",
+});
+
+const retriever = vectorStore.asRetriever();
 
 const hfTextGen = new HuggingFaceInference({
   model: "tiiuae/falcon-7b-instruct",
@@ -17,11 +38,13 @@ const standalonePrompt = PromptTemplate.fromTemplate(
   standaloneQuestionTemplate
 );
 
-const standaloneQuestionChain = standalonePrompt.pipe(hfTextGen);
-
-const result = await standaloneQuestionChain.invoke({
+const chain = standalonePrompt
+  .pipe(hfTextGen)
+  .pipe(new StringOutputParser())
+  .pipe(retriever);
+const result = await chain.invoke({
   question:
-    "What are the technical requirements for running Scrimba? I only have a very old laptop which is not that powerful. I really like playing Halo so maybe I can upgrade my latop to play Scrimba? I love turtles btw how do you feel about turtles?",
+    "What are the technical requirements for running Scrimba? I only have a very old laptop which is not that powerful.",
 });
 
 console.log(result);
