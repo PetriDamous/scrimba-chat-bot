@@ -10,10 +10,9 @@
   },
   "dependencies": {
     "@huggingface/inference": "^2.8.1",
-    "@langchain/community": "^0.3.34",
+    "@langchain/community": "^0.3.36",
     "@langchain/core": "^0.3.42",
-    "@supabase/supabase-js": "^2.49.1",
-    "dotenv": "^16.4.7"
+    "@supabase/supabase-js": "^2.49.1"
   },
   "devDependencies": {
     "vite": "^6.2.0"
