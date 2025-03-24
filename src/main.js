@@ -2,6 +2,7 @@ import { HuggingFaceInference } from "@langchain/community/llms/hf";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import retriever from "./utils/retriever.js";
+import { combineDocs } from "./utils/helper.js";
 
 const hfApiKey = import.meta.env.VITE_HUGGINGFACE_API_KEY;
 
@@ -15,6 +16,12 @@ const hfTextGen = new HuggingFaceInference({
 const standaloneQuestionTemplate =
   "Given a question, convert it to a standalone question. question: {question} standalone question:";
 
+const answerTemplate = `You are a helpful and enthusiastic support bot who can answer a given question about Scrimba based on the context provided. Try to find the answer in the context. If you really don't know the answer, say "I'm sorry, I don't know the answer to that." And direct the questioner to email help@scrimba.com. Don't try to make up an answer. Always speak as if you were chatting to a friend.
+constext: {context}
+question: {question}
+answer: 
+`;
+
 const standalonePrompt = PromptTemplate.fromTemplate(
   standaloneQuestionTemplate
 );
@@ -22,7 +29,9 @@ const standalonePrompt = PromptTemplate.fromTemplate(
 const chain = standalonePrompt
   .pipe(hfTextGen)
   .pipe(new StringOutputParser())
-  .pipe(retriever);
+  .pipe(retriever)
+  .pipe(combineDocs);
+
 const result = await chain.invoke({
   question:
     "What are the technical requirements for running Scrimba? I only have a very old laptop which is not that powerful.",
