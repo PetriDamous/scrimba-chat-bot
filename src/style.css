@@ -52,7 +52,7 @@ main {
 }
 
 .chatbot-conversation-container {
-  height: 250px;
+  height: 30rem;
   overflow-y: scroll;
   margin: 1em 0;
 }
